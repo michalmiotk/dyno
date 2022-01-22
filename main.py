@@ -8,13 +8,6 @@ from data_from_df import add_to_df_with_wheel_torque, add_to_df_power_in_KM, add
 from create_figure import create_figure
 
 
-def number_validator():
-    try:
-        get_wheel_diameter()
-    except:
-        print("no sie nie udalo - zle wpisana srednica kola")
-
-
 root = Tk()
 frm = ttk.Frame(root, padding=10)
 frm.grid()
