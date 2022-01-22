@@ -3,7 +3,7 @@ from tkinter import ttk
 from tkinter import filedialog as fd
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
-from parse_file import get_df_from_file
+from parse_file import get_df_from_file, is_valid_csv
 from data_from_df import add_to_df_with_wheel_torque, add_to_df_power_in_KM, add_to_df_engine_rot_speed
 
 def number_validator():
@@ -50,6 +50,8 @@ def get_wheel_diameter():
 def get_gear_ratio():
     return float(gear_ratio_entry.get())
 
+
+
 def is_valid_gear_ratio():
     try:
         get_gear_ratio()
@@ -95,6 +97,10 @@ def select_file():
 
     if filename == '':
         communicates_label.config(text = "No choosen file")    
+        return
+    
+    if not is_valid_csv(filename):
+        communicates_label.config(text = "No valid csv")    
         return
 
     communicates_label.config(text = "")  
