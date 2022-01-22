@@ -1,4 +1,3 @@
-from distutils import command
 from tkinter import Tk
 from tkinter import ttk
 from tkinter import filedialog as fd
@@ -27,6 +26,9 @@ gear_ratio_entry = ttk.Entry(root)
 gear_ratio_entry.insert(0, '1')
 gear_ratio_entry.grid(row=2, column=1)
 
+communicates_label = ttk.Label(root)
+communicates_label.grid(row=3, column=0)
+
 def draw_chart(df):
     figure = plt.Figure(figsize=(8,8), dpi=100)
     marg = 0.15
@@ -37,7 +39,7 @@ def draw_chart(df):
     ax.legend(loc="right", fontsize=14)
     canvas = FigureCanvasTkAgg(figure, root)
     canvas.draw()
-    canvas.get_tk_widget().grid(row=3, column=0, ipadx=40, ipady=20)
+    canvas.get_tk_widget().grid(row=4, column=0, ipadx=40, ipady=20)
 
 
 
@@ -47,8 +49,39 @@ def get_wheel_diameter():
 def get_gear_ratio():
     return float(gear_ratio_entry.get())
 
+def is_valid_gear_ratio():
+    try:
+        get_gear_ratio()
+    except ValueError as e:
+        print(e)
+        print("not valid gear_ratio")
+    else:
+        return True
+    
+    return False
+
+def is_valid_wheel_diameter():
+    try:
+        get_wheel_diameter()
+    except ValueError as e:
+        print(e)
+        print("not valid wheel_diameter")
+    else:
+        return True
+    
+    return False
+
+
 def select_file():
-    number_validator()
+    
+    if not is_valid_wheel_diameter():
+        communicates_label.config(text = "bad wheel diameter format")
+        return
+
+    if not is_valid_gear_ratio():
+        communicates_label.config(text = "bad gear ratio format")
+        return
+    
     filetypes = (
         ('text files', '*.txt'),
         ('All files', '*.*')
@@ -59,6 +92,11 @@ def select_file():
         initialdir='/',
         filetypes=filetypes)
 
+    if filename == '':
+        communicates_label.config(text = "No choosen file")    
+        return
+
+    communicates_label.config(text = "")  
     df = get_df_from_file(filename)
     df_with_wheel_torque = add_to_df_with_wheel_torque(df, wheel_diameter_in_cm=get_wheel_diameter())
     df_with_wheel_torque_and_power_in_KM = add_to_df_power_in_KM(df)
