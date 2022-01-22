@@ -11,29 +11,29 @@ from create_figure import Figure
 
 
 root = Tk()
+root.title('Hamownia')
 frm = ttk.Frame(root, padding=10)
 frm.grid()
 
-ttk.Label(root, text="Wheel diameter in cm").grid(row=0, column=2)
+ttk.Label(root, text="Wheel diameter in cm").grid(row=1, column=0)
 
 wheel_diameter_entry = ttk.Entry(root)
 wheel_diameter_entry.insert(0, '1')
-wheel_diameter_entry.grid(row=0, column=3)
+wheel_diameter_entry.grid(row=1, column=1)
 
-ttk.Label(root, text="Entire gear ratio").grid(row=0, column=4)
+ttk.Label(root, text="Entire gear ratio").grid(row=2, column=0)
 
 gear_ratio_entry = ttk.Entry(root)
 gear_ratio_entry.insert(0, '1')
-gear_ratio_entry.grid(row=0, column=5)
+gear_ratio_entry.grid(row=2, column=1)
 
-communicates_label = ttk.Label(root)
-communicates_label.grid(row=2, column=0)
-
-ttk.Label(root, text="Moto name").grid(row=1, column=0)
+ttk.Label(root, text="Moto name").grid(row=3, column=0)
 
 moto_name_entry = ttk.Entry(root)
-moto_name_entry.insert(0, 'without_spaces')
-moto_name_entry.grid(row=1, column=1)
+moto_name_entry.grid(row=3, column=1)
+
+communicates_label = ttk.Label(root)
+communicates_label.grid(row=4, column=0)
 
 figure = Figure()
 
@@ -41,7 +41,7 @@ figure = Figure()
 def draw_figure(figure):
     canvas = FigureCanvasTkAgg(figure, root)
     canvas.draw()
-    canvas.get_tk_widget().grid(row=3, column=0)
+    canvas.get_tk_widget().grid(row=5, columnspan=2)
 
 
 
@@ -114,7 +114,17 @@ def select_file():
 
 def save_figure():
     moto_name = moto_name_entry.get()
-    now_time = str(datetime.datetime.now().strftime("%Y%m%d%H%M%S"))
+    if moto_name == '':
+        communicates_label.config(text = "Empty moto name")    
+        return
+   
+    now_time = str(datetime.datetime.now().strftime("%Y_%m_%d_%H_%M_%S"))
+    if figure.is_figure_empty():
+        communicates_label.config(text = "No figure")
+        return
+
+    communicates_label.config(text = "") 
+    
     figure.save_figure(moto_name + '_' + now_time + '.png')
 
 ttk.Button(frm, text="Open file", command=select_file).grid(row=0, column=0)

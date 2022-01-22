@@ -2,7 +2,7 @@ import matplotlib.pyplot as plt
 
 class Figure():
     def __init__(self):
-        self.figure =plt.Figure(figsize=(8,8), dpi=100)
+        self.figure =plt.Figure(figsize=(9,8), dpi=100)
     
     def create_figure(self, df):
         marg = 0.15
@@ -15,3 +15,6 @@ class Figure():
 
     def save_figure(self, filename):
         self.figure.savefig(filename)
+    
+    def is_figure_empty(self):
+        return len(self.figure.get_axes()) ==  0
