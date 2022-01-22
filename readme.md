@@ -7,3 +7,6 @@ pip install pyinstaller
 cd building
 pyinstaller --onefile --windowed --hidden-import=matplotlib --hidden-import=tkinter ../main.py
 ```
+
+# run tests
+py.test
