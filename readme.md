@@ -5,7 +5,7 @@ python 3.10.2
 ```
 pip install pyinstaller
 cd building
-pyinstaller --onefile --windowed --hidden-import=matplotlib --hidden-import=tkinter ../main.py
+pyinstaller --onefile --windowed --hidden-import=matplotlib --hidden-import=tkinter --hidden-import=pandas main.py
 ```
 
 # run tests
