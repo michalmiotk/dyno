@@ -1,6 +1,14 @@
 version: 2.1
 
-jobs:  
+jobs:
+  build:
+    working_directory: ~/circleci-python
+    docker:
+      - image: "circleci/python:3.9"
+    steps:
+      - checkout
+      - run: pip install -r requirements.txt
+  
   test:
     working_directory: ~/circleci-python
     docker:
