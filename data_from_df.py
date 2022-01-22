@@ -12,3 +12,6 @@ def add_to_df_power_in_KM(df: pd.DataFrame):
 def add_to_df_engine_rot_speed(df: pd.DataFrame, wheel_diameter_in_cm, gear_ratio):
     df['engine_rot_speed'] = df.apply(lambda row: get_engine_rot_speed(row.shaft_rpm, wheel_diameter_in_cm, gear_ratio), axis=1)
     return df
+
+def get_max_power_in_KM(df: pd.DataFrame):
+    return df['power_in_KM'].max()

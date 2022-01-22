@@ -10,3 +10,5 @@ pyinstaller --onefile --windowed --hidden-import=matplotlib --hidden-import=tkin
 
 # run tests
 py.test
+
+![how_app_look](app_preview.PNG)

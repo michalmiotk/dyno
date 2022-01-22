@@ -127,6 +127,7 @@ def save_figure():
     
     figure.save_figure(moto_name + '_' + now_time + '.png')
 
+draw_figure(figure.figure)
 ttk.Button(frm, text="Open file", command=select_file).grid(row=0, column=0)
 ttk.Button(frm, text="Save figure", command=save_figure).grid(row=0, column=1)
 root.mainloop()
