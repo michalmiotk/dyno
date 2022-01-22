@@ -5,7 +5,7 @@ from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 
 from parse_file import get_df_from_file, is_valid_csv
 from data_from_df import add_to_df_with_wheel_torque, add_to_df_power_in_KM, add_to_df_engine_rot_speed
-from create_figure import create_figure
+from create_figure import Figure
 
 
 root = Tk()
@@ -24,10 +24,10 @@ gear_ratio_entry.grid(row=2, column=1)
 communicates_label = ttk.Label(root)
 communicates_label.grid(row=3, column=0)
 
+figure = Figure()
 
 
-def draw_chart(df):
-    figure = create_figure(df)
+def draw_figure(figure):
     canvas = FigureCanvasTkAgg(figure, root)
     canvas.draw()
     canvas.get_tk_widget().grid(row=4, column=0, ipadx=40, ipady=20)
@@ -98,7 +98,13 @@ def select_file():
     df_with_wheel_torque = add_to_df_with_wheel_torque(df, wheel_diameter_in_cm=get_wheel_diameter())
     df_with_wheel_torque_and_power_in_KM = add_to_df_power_in_KM(df)
     df_with_wheel_torque_and_power_in_KM_and_engine_rot_speed = add_to_df_engine_rot_speed(df, get_wheel_diameter(), get_gear_ratio())
-    draw_chart(df_with_wheel_torque_and_power_in_KM_and_engine_rot_speed)
-    
-ttk.Button(frm, text="Otworz plik", command=select_file).grid(column=1, row=1)
+    figure.create_figure(df_with_wheel_torque_and_power_in_KM_and_engine_rot_speed)
+    draw_figure(figure.figure)
+
+def save_figure():
+    moto = "super"
+    figure.save_figure(moto + '.png')
+
+ttk.Button(frm, text="Open file", command=select_file).grid(row=0, column=0)
+ttk.Button(frm, text="Save figure", command=save_figure).grid(row=0, column=1)
 root.mainloop()
