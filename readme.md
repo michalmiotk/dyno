@@ -9,6 +9,8 @@ cd building
 pyinstaller --onefile --windowed main.py
 ```
 
+but best to have pyinstaller builded from scratch to have less viruses detected
+
 good to check that file is virus free by: https://www.virustotal.com/
 
 # run tests
