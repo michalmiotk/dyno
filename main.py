@@ -92,13 +92,13 @@ def select_file():
         return
     
     filetypes = (
-        ('text files', '*.txt'),
+        ('text files', '*'),
         ('All files', '*.*')
     )
 
     filename = fd.askopenfilename(
         title='Open a file',
-        initialdir='/',
+        initialdir='./',
         filetypes=filetypes)
 
     if filename == '':
@@ -166,7 +166,7 @@ def update_gui(uart_process_q, df):
 def connect():
     port = port_entry.get()
     baud = baud_entry.get()
-
+    global serial_object
     try:
         serial_object = serial.Serial('COM' + str(port), baud)
 
@@ -179,13 +179,16 @@ def connect():
     t1.daemon = True
     t1.start()
 
+def disconnect():
+    if serial_object is not None:
+        serial_object.close()
 
 draw_figure(figure.figure)
 ttk.Button(frm, text="Open file", command=select_file).grid(row=0, column=0)
 ttk.Button(frm, text="Save figure", command=save_figure).grid(row=0, column=1)
 
 ttk.Button(text="Connect", command=connect).grid(row=6, column=0)
-
+ttk.Button(text="Disonnect", command=disconnect).grid(row=6, column=1)
 baud_label = ttk.Label(text="Baud")
 baud_label.grid(row=7, column=0)
 
