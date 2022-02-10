@@ -1,5 +1,5 @@
 import datetime
-from multiprocessing import Queue
+import queue
 import threading
 import serial
 from tkinter import Tk
@@ -42,10 +42,11 @@ communicates_label = ttk.Label(root)
 communicates_label.grid(row=4, column=0)
 
 figure = Figure()
-uart_process_queue = Queue()
+uart_process_queue = queue.Queue()
 
 t1 = None
 yar = []
+update_gui_enabled = False
 
 def draw_figure(figure):
     canvas = FigureCanvasTkAgg(figure, root)
@@ -145,15 +146,18 @@ def get_data(queue, serial_obj):
             filter_data = serial_data.split(',')
             filter_data = [int(d) for d in filter_data]
             queue.put(filter_data)
+            print("dane wsadzone")
         except TypeError as e:
             print("tajp error", e)
             pass
 
 def update_gui(uart_process_q, df):
-    while (1):
+    global update_gui_enabled
+    while (update_gui_enabled):
         print("update")
-
-        if filter_data:=uart_process_q.get():
+        try:
+            print("probouje zdobyc dane")
+            filter_data =uart_process_q.get()
             print("plottime", filter_data)
             new_df = df_from_uart_row(filter_data)
             df = pd.concat([df, new_df])
@@ -162,11 +166,22 @@ def update_gui(uart_process_q, df):
             add_to_df_engine_rot_speed(df, get_wheel_diameter(), get_gear_ratio())
             figure.create_figure(df)
             draw_figure(figure.figure)
+        except queue.Empty as e:
+            print(e)
+    print("updating gui stopped")
+
+def start_update_gui_thread():
+    t2 = threading.Thread(target=update_gui, args=(uart_process_queue, df))
+    t2.daemon = True
+    t2.start()
 
 def connect():
+    global df
+    df = pd.DataFrame()
     port = port_entry.get()
     baud = baud_entry.get()
     global serial_object
+    global update_gui_enabled
     try:
         serial_object = serial.Serial('COM' + str(port), baud)
 
@@ -178,10 +193,16 @@ def connect():
     t1 = threading.Thread(target=get_data, args=(uart_process_queue, serial_object))
     t1.daemon = True
     t1.start()
+    update_gui_enabled = True
+    start_update_gui_thread()
 
 def disconnect():
+    global update_gui_enabled
+    global df
     if serial_object is not None:
+        df = pd.DataFrame()
         serial_object.close()
+        update_gui_enabled = False
 
 draw_figure(figure.figure)
 ttk.Button(frm, text="Open file", command=select_file).grid(row=0, column=0)
@@ -204,8 +225,6 @@ port_entry.insert(0, '1')
 
 df = pd.DataFrame()
 
-t2 = threading.Thread(target=update_gui, args=(uart_process_queue, df))
-t2.daemon = True
-t2.start()
+
 
 root.mainloop()
