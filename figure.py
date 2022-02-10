@@ -7,7 +7,7 @@ class Figure():
         self.figure =plt.Figure(figsize=self.figsize, dpi=100)
         self.marg = 0.15
         
-    def create_figure(self, df):
+    def update_figure(self, df):
         self.figure =plt.Figure(figsize=self.figsize, dpi=100)
         ax = self.figure.add_axes([self.marg, self.marg, 1-1.8*self.marg, 1-1.8*self.marg])
         ax.plot(df['engine_rot_speed'], df['torque_on_wheel'], c='blue', lw=1, label="torque_on_wheel", marker='s')
