@@ -9,7 +9,7 @@ void setup() {
 void loop() {
   int max_step = 10000;
   for(int x=1;x<max_step;x++){
-    Serial.print(x);
+    Serial.print(x*int(sqrt(x)));
     Serial.print(", ");
     Serial.println(max_step/x);
     delay(1000);
