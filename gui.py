@@ -1,17 +1,22 @@
 from tkinter import Tk
 from tkinter import ttk
 from tkinter import filedialog as fd
+from tkinter import StringVar
+from tkinter import OptionMenu
+
 from figure import Figure
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 
 class Gui():
-    def __init__(self, connect_method, disconnect_method, save_figure_method, select_file_method):
+    def __init__(self, connect_method, disconnect_method, save_figure_method, select_file_method, get_coms_description_method):
 
 
         self.connect_method = connect_method
         self.disconnect_method = disconnect_method
         self.save_figure_method = save_figure_method
         self.select_file_method = select_file_method
+        self.get_coms_description_method = get_coms_description_method
+        
         self.figure = Figure()
         self.root = Tk()
         self.root.title('Hamownia')
@@ -42,6 +47,7 @@ class Gui():
 
         ttk.Button(text="Connect", command=self.connect_method).grid(row=6, column=0)
         ttk.Button(text="Disonnect", command=self.disconnect_method).grid(row=6, column=1)
+        
         baud_label = ttk.Label(text="Baud")
         baud_label.grid(row=7, column=0)
 
@@ -49,12 +55,20 @@ class Gui():
         self.baud_entry.grid(row=7, column=1)
         self.baud_entry.insert(0, '9600')
 
-        port_label = ttk.Label(text="Port")
-        port_label.grid(row=8, column=0)
-        self.port_entry = ttk.Entry(width=7)
-        self.port_entry.grid(row=8, column=1)
-        self.port_entry.insert(0, '1')
         self.draw_figure(self.figure.figure)
+
+        self.refresh_coms = ttk.Button(self.frm, text="Open file", command=self.select_file_method).grid(row=0, column=0)
+
+        self.value_inside = StringVar(self.root)
+        self.setup_dropdown_list()
+        ttk.Button(text="Refresh COMs", command=self.setup_dropdown_list).grid(row=8, column=1)
+    def setup_dropdown_list(self):
+        print("setupuje dropdown")
+        port_list = self.get_coms_description_method()
+        self.value_inside.set("Select COM")
+        self.question_menu = OptionMenu(self.root, self.value_inside, *port_list)
+        self.question_menu.grid(row=8, column=0)
+    
 
     def draw_figure(self, figure):
         canvas = FigureCanvasTkAgg(figure, self.root)
@@ -72,12 +86,6 @@ class Gui():
     def get_gear_ratio(self):
         return float(self.gear_ratio_entry.get())
 
-    def select_file(self):
-        pass
-
-    def save_figure(self):
-        pass
-        
     def mainloop(self):
         self.root.mainloop()
 

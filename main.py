@@ -3,7 +3,7 @@ import queue
 import threading
 
 import serial
-
+import serial.tools.list_ports
 import pandas as pd
 
 from parse_file import get_df_from_file, is_valid_csv
@@ -15,7 +15,7 @@ from gui import Gui
 
 class Program():
     def __init__(self):
-        self.gui = Gui(self.connect, self.disconnect, self.save_figure, self.select_file)
+        self.gui = Gui(self.connect, self.disconnect, self.save_figure, self.select_file, self.get_coms_description)
         self.serial_object = None
                 
         self.uart_process_queue = queue.Queue()
@@ -25,6 +25,15 @@ class Program():
         self.serial_object = None
         self.gui.mainloop()  
 
+
+    def get_coms(self):
+        return serial.tools.list_ports.comports()
+
+    def get_coms_description(self):
+        coms_names = []
+        for com in serial.tools.list_ports.comports():
+            coms_names.append(com.description)
+        return coms_names
 
     def is_valid_gear_ratio(self):
         try:
@@ -141,10 +150,14 @@ class Program():
 
     def connect(self):
         self.uart_df = pd.DataFrame()
-        port = self.gui.get_port() 
+        com_description = self.gui.value_inside.get()
+        port = self.found_com_path_in_available_coms(com_description) 
+        if port is None:
+            self.gui.set_communicates_label("can't find " + com_description)
+            return
         baud = self.gui.get_baud() 
         try:
-            self.serial_object = serial.Serial('COM' + str(port), baud)
+            self.serial_object = serial.Serial(port, baud)
 
         except ValueError:
             print("Enter Baud and Port")
@@ -164,5 +177,13 @@ class Program():
             self.serial_object.close()
             self.update_gui_enabled = False
     
+    def found_com_path_in_available_coms(self, com_description):
+        for com in self.get_coms():
+            print(com.description)
+            if str(com.description) == com_description:
+                return com.device
+
+        return None
+
 if __name__ == '__main__':
     program = Program()
