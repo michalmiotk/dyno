@@ -113,12 +113,22 @@ class Program():
                 filter_data =uart_process_q.get()
                 print("plottime", filter_data)
                 new_df = df_from_uart_row(filter_data)
+                
+                
+                add_to_df_with_wheel_torque(new_df, wheel_diameter_in_cm=self.gui.get_wheel_diameter())
+                add_to_df_power_in_KM(new_df)
+                add_to_df_engine_rot_speed(new_df, self.gui.get_wheel_diameter(), self.gui.get_gear_ratio())
+                power_in_KM_list = list(new_df['power_in_KM'])
+                assert len(power_in_KM_list) == 1
+                self.gui.set_instant_power_label(power_in_KM_list[0])
+                torque_in_Nm_list = list(new_df['torque_on_wheel'])
+                assert len(torque_in_Nm_list) == 1
+                self.gui.set_instant_torque_label(torque_in_Nm_list[0])
+
                 self.uart_df = pd.concat([self.uart_df, new_df])
-                add_to_df_with_wheel_torque(self.uart_df, wheel_diameter_in_cm=self.gui.get_wheel_diameter())
-                add_to_df_power_in_KM(self.uart_df)
-                add_to_df_engine_rot_speed(self.uart_df, self.gui.get_wheel_diameter(), self.gui.get_gear_ratio())
                 self.gui.figure.update_figure(self.uart_df)
                 self.gui.draw_figure(self.gui.figure.figure)
+
             except queue.Empty as e:
                 print(e)
         print("updating gui stopped")

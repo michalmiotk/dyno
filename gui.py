@@ -3,6 +3,7 @@ from tkinter import ttk
 from tkinter import filedialog as fd
 from tkinter import StringVar
 from tkinter import OptionMenu
+import tkinter
 
 from figure import Figure
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
@@ -42,6 +43,11 @@ class Gui():
         self.communicates_label = ttk.Label(self.root)
         self.communicates_label.grid(row=4, column=0)
         
+        self.instant_power_label = tkinter.Label(self.root, fg="red", font=("Courier", 24))
+        self.instant_power_label.grid(row=9, column=0)
+        self.instant_torque_label = tkinter.Label(self.root, fg="blue", font=("Courier", 24))
+        self.instant_torque_label.grid(row=9, column=1)
+
         ttk.Button(self.frm, text="Open file", command=self.select_file_method).grid(row=0, column=0)
         ttk.Button(self.frm, text="Save figure", command=self.save_figure_method).grid(row=0, column=1)
 
@@ -62,13 +68,21 @@ class Gui():
         self.value_inside = StringVar(self.root)
         self.setup_dropdown_list()
         ttk.Button(text="Refresh COMs", command=self.setup_dropdown_list).grid(row=8, column=1)
+
     def setup_dropdown_list(self):
         print("setupuje dropdown")
         port_list = self.get_coms_description_method()
         self.value_inside.set("Select COM")
         self.question_menu = OptionMenu(self.root, self.value_inside, *port_list)
         self.question_menu.grid(row=8, column=0)
-    
+
+    def set_instant_power_label(self, instant_power_in_KM: float):
+        text = str(round(instant_power_in_KM, 1)) + ' KM'
+        self.instant_power_label.config(text=text)    
+
+    def set_instant_torque_label(self, instant_torque_in_Nm: float):
+        text = str(round(instant_torque_in_Nm, 1)) + ' Nm'
+        self.instant_torque_label.config(text=text)    
 
     def draw_figure(self, figure):
         canvas = FigureCanvasTkAgg(figure, self.root)
