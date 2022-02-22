@@ -29,7 +29,7 @@ class Gui():
         style = ttk.Style(self.root)
         style.theme_use('clam')
 
-        self.figure_column_span = 6
+        self.figure_column_span = 8
 
         self.setup_logo(row=0, column=0)
         ttk.Label(self.root, text="Wheel diameter in cm").grid(row=0, column=1)
