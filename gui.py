@@ -26,7 +26,9 @@ class Gui():
         self.root.iconphoto(False, photo)
         self.frm = ttk.Frame(self.root, padding=10)
         self.frm.grid()
-        
+        style = ttk.Style(self.root)
+        style.theme_use('clam')
+
         self.figure_column_span = 6
 
         self.setup_logo(row=0, column=0)
@@ -64,10 +66,10 @@ class Gui():
         
 
         ttk.Button(text="Connect", command=self.connect_method).grid(row=3, column=2)
-        ttk.Button(text="Disonnect", command=self.disconnect_method).grid(row=3, column=3)
+        ttk.Button(text="Disconnect", command=self.disconnect_method).grid(row=3, column=3)
         ttk.Button(text="Refresh COMs", command=self.setup_dropdown_list).grid(row=3, column=4)
         
-        self.setup_dropdown_list(row=3, column=5)
+        self.setup_dropdown_list()
 
         baud_label = ttk.Label(text="Baud")
         baud_label.grid(row=3, column=6)
@@ -86,16 +88,16 @@ class Gui():
         logo = Image.open("logo.png")
         logo_small = logo.resize((122, 56), Image.ANTIALIAS)
         test = ImageTk.PhotoImage(logo_small)
-        label1 = ttk.Label(image=test)
+        label1 = tkinter.Label(image=test, bg="white")
         label1.image = test
         label1.grid(row=row, column=column)   
 
-    def setup_dropdown_list(self, row, column):
+    def setup_dropdown_list(self):
         self.value_inside = StringVar(self.root)
         port_list = self.get_coms_description_method()
         self.value_inside.set("Select COM")
         self.question_menu = OptionMenu(self.root, self.value_inside, *port_list)
-        self.question_menu.grid(row=row, column=column)
+        self.question_menu.grid(row=3, column=5)
 
     def set_instant_power_label(self, instant_power_in_KM: float):
         text = str(round(instant_power_in_KM, 1)) + ' KM'
