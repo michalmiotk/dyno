@@ -4,6 +4,7 @@ from tkinter import filedialog as fd
 from tkinter import StringVar
 from tkinter import OptionMenu
 import tkinter
+from PIL import ImageTk, Image 
 
 from figure import Figure
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
@@ -20,61 +21,81 @@ class Gui():
         
         self.figure = Figure()
         self.root = Tk()
-        self.root.title('Hamownia')
+        self.root.title('Dyno')
+        photo = tkinter.PhotoImage(file = "logo.png")
+        self.root.iconphoto(False, photo)
         self.frm = ttk.Frame(self.root, padding=10)
         self.frm.grid()
-        ttk.Label(self.root, text="Wheel diameter in cm").grid(row=1, column=0)
+        
+        self.figure_column_span = 6
+
+        self.setup_logo(row=0, column=0)
+        ttk.Label(self.root, text="Wheel diameter in cm").grid(row=0, column=1)
 
         self.wheel_diameter_entry = ttk.Entry(self.root)
         self.wheel_diameter_entry.insert(0, '1')
-        self.wheel_diameter_entry.grid(row=1, column=1)
+        self.wheel_diameter_entry.grid(row=0, column=2)
 
-        ttk.Label(self.root, text="Entire gear ratio").grid(row=2, column=0)
+        ttk.Label(self.root, text="Entire gear ratio").grid(row=0, column=3)
 
         self.gear_ratio_entry = ttk.Entry(self.root)
         self.gear_ratio_entry.insert(0, '1')
-        self.gear_ratio_entry.grid(row=2, column=1)
+        self.gear_ratio_entry.grid(row=0, column=4)
 
-        ttk.Label(self.root, text="Moto name").grid(row=3, column=0)
+        ttk.Label(self.root, text="Moto name").grid(row=0, column=5)
 
         self.moto_name_entry = ttk.Entry(self.root)
-        self.moto_name_entry.grid(row=3, column=1)
+        self.moto_name_entry.grid(row=0, column=6)
 
-        self.communicates_label = ttk.Label(self.root)
-        self.communicates_label.grid(row=4, column=0)
+        
         
         self.instant_power_label = tkinter.Label(self.root, fg="red", font=("Courier", 24))
-        self.instant_power_label.grid(row=9, column=0)
+        self.instant_power_label.grid(row=2, column=0)
         self.instant_torque_label = tkinter.Label(self.root, fg="blue", font=("Courier", 24))
-        self.instant_torque_label.grid(row=9, column=1)
+        self.instant_torque_label.grid(row=2, column=1)
 
-        ttk.Button(self.frm, text="Open file", command=self.select_file_method).grid(row=0, column=0)
-        ttk.Button(self.frm, text="Save figure", command=self.save_figure_method).grid(row=0, column=1)
+        self.communicates_label = ttk.Label(self.root)
+        self.communicates_label.grid(row=2, column=2)
 
-        ttk.Button(text="Connect", command=self.connect_method).grid(row=6, column=0)
-        ttk.Button(text="Disonnect", command=self.disconnect_method).grid(row=6, column=1)
         
+        
+        ttk.Button(text="Open file", command=self.select_file_method).grid(row=3, column=0)
+        ttk.Button(text="Save figure", command=self.save_figure_method).grid(row=3, column=1)
+        
+
+        ttk.Button(text="Connect", command=self.connect_method).grid(row=3, column=2)
+        ttk.Button(text="Disonnect", command=self.disconnect_method).grid(row=3, column=3)
+        ttk.Button(text="Refresh COMs", command=self.setup_dropdown_list).grid(row=3, column=4)
+        
+        self.setup_dropdown_list(row=3, column=5)
+
         baud_label = ttk.Label(text="Baud")
-        baud_label.grid(row=7, column=0)
+        baud_label.grid(row=3, column=6)
 
         self.baud_entry = ttk.Entry(width=7)
-        self.baud_entry.grid(row=7, column=1)
+        self.baud_entry.grid(row=3, column=7)
         self.baud_entry.insert(0, '9600')
 
         self.draw_figure(self.figure.figure)
 
-        self.refresh_coms = ttk.Button(self.frm, text="Open file", command=self.select_file_method).grid(row=0, column=0)
+        
+        
+        
 
+    def setup_logo(self, row, column):
+        logo = Image.open("logo.png")
+        logo_small = logo.resize((122, 56), Image.ANTIALIAS)
+        test = ImageTk.PhotoImage(logo_small)
+        label1 = ttk.Label(image=test)
+        label1.image = test
+        label1.grid(row=row, column=column)   
+
+    def setup_dropdown_list(self, row, column):
         self.value_inside = StringVar(self.root)
-        self.setup_dropdown_list()
-        ttk.Button(text="Refresh COMs", command=self.setup_dropdown_list).grid(row=8, column=1)
-
-    def setup_dropdown_list(self):
-        print("setupuje dropdown")
         port_list = self.get_coms_description_method()
         self.value_inside.set("Select COM")
         self.question_menu = OptionMenu(self.root, self.value_inside, *port_list)
-        self.question_menu.grid(row=8, column=0)
+        self.question_menu.grid(row=row, column=column)
 
     def set_instant_power_label(self, instant_power_in_KM: float):
         text = str(round(instant_power_in_KM, 1)) + ' KM'
@@ -87,12 +108,12 @@ class Gui():
     def draw_figure(self, figure):
         canvas = FigureCanvasTkAgg(figure, self.root)
         canvas.draw()
-        canvas.get_tk_widget().grid(row=5, columnspan=2)
+        canvas.get_tk_widget().grid(row=5, columnspan=self.figure_column_span)
 
     def draw_internal_figure(self):
         canvas = FigureCanvasTkAgg(self.figure.figure, self.root)
         canvas.draw()
-        canvas.get_tk_widget().grid(row=5, columnspan=2)
+        canvas.get_tk_widget().grid(row=5, columnspan=self.figure_column_span)
 
     def get_wheel_diameter(self):
         return float(self.wheel_diameter_entry.get())

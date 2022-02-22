@@ -24,5 +24,5 @@ class Figure():
         return len(self.figure.get_axes()) ==  0
     
     def get_max_power_text(self, df):
-        max_power_in_KM = get_max_power_in_KM(df)
+        max_power_in_KM = round(get_max_power_in_KM(df),1)
         return 'Pwr=' + str(max_power_in_KM) + 'KM'
