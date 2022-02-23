@@ -9,8 +9,9 @@ from PIL import ImageTk, Image
 from figure import Figure
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 
+
 class Gui():
-    def __init__(self, connect_method, disconnect_method, save_figure_method, select_file_method, get_coms_description_method):
+    def __init__(self, connect_method, disconnect_method, save_figure_method, select_file_method, get_coms_description_method, print_chart_method):
 
 
         self.connect_method = connect_method
@@ -18,7 +19,8 @@ class Gui():
         self.save_figure_method = save_figure_method
         self.select_file_method = select_file_method
         self.get_coms_description_method = get_coms_description_method
-        
+        self.print_chart_method = print_chart_method
+
         self.figure = Figure()
         self.root = Tk()
         self.root.title('Dyno')
@@ -63,19 +65,19 @@ class Gui():
         
         ttk.Button(text="Open file", command=self.select_file_method).grid(row=3, column=0)
         ttk.Button(text="Save figure", command=self.save_figure_method).grid(row=3, column=1)
-        
+        ttk.Button(text="Print chart", command=self.print_chart_method).grid(row=3, column=2)
 
-        ttk.Button(text="Connect", command=self.connect_method).grid(row=3, column=2)
-        ttk.Button(text="Disconnect", command=self.disconnect_method).grid(row=3, column=3)
-        ttk.Button(text="Refresh COMs", command=self.setup_dropdown_list).grid(row=3, column=4)
+        ttk.Button(text="Connect", command=self.connect_method).grid(row=3, column=3)
+        ttk.Button(text="Disconnect", command=self.disconnect_method).grid(row=3, column=4)
+        ttk.Button(text="Refresh COMs", command=self.setup_dropdown_list).grid(row=3, column=5)
         
         self.setup_dropdown_list()
 
         baud_label = ttk.Label(text="Baud")
-        baud_label.grid(row=3, column=6)
+        baud_label.grid(row=3, column=7)
 
         self.baud_entry = ttk.Entry(width=7)
-        self.baud_entry.grid(row=3, column=7)
+        self.baud_entry.grid(row=3, column=8)
         self.baud_entry.insert(0, '9600')
 
         self.draw_figure(self.figure.figure)
@@ -97,7 +99,7 @@ class Gui():
         port_list = self.get_coms_description_method()
         self.value_inside.set("Select COM")
         self.question_menu = OptionMenu(self.root, self.value_inside, *port_list)
-        self.question_menu.grid(row=3, column=5)
+        self.question_menu.grid(row=3, column=6)
 
     def set_instant_power_label(self, instant_power_in_KM: float):
         text = str(round(instant_power_in_KM, 1)) + ' KM'

@@ -11,11 +11,11 @@ from data_from_df import add_to_df_with_wheel_torque, add_to_df_power_in_KM, add
 
 from df_from_uart import df_from_uart_row
 from gui import Gui
-
+from print import print_file
 
 class Program():
     def __init__(self):
-        self.gui = Gui(self.connect, self.disconnect, self.save_figure, self.select_file, self.get_coms_description)
+        self.gui = Gui(self.connect, self.disconnect, self.save_figure, self.select_file, self.get_coms_description, self.print_chart_method)
         self.serial_object = None
                 
         self.uart_process_queue = queue.Queue()
@@ -24,7 +24,6 @@ class Program():
         self.uart_df = pd.DataFrame()
         self.serial_object = None
         self.gui.mainloop()  
-
 
     def get_coms(self):
         return serial.tools.list_ports.comports()
@@ -88,6 +87,21 @@ class Program():
         self.gui.figure.update_figure(df)
         self.gui.draw_figure(self.gui.figure.figure)
 
+    def print_chart_method(self):
+        if self.gui.figure.is_figure_empty():
+            self.gui.set_communicates_label("No figure")
+            return
+        self.gui.clear_communicates_label()
+        figure_filename = 'print.png'
+        
+        moto_name = self.gui.get_moto_name()
+        if moto_name == '':
+            self.gui.set_communicates_label("Empty moto name - needed for printing")    
+            return
+        
+        self.gui.figure.add_moto_name_to_figure(moto_name)
+        self.gui.figure.save_figure(figure_filename)
+        print_file(figure_filename)
 
     def save_figure(self):
         moto_name = self.gui.get_moto_name()
