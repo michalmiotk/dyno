@@ -23,7 +23,6 @@ class Program():
 
         self.update_gui_enabled = False
         self.uart_df = pd.DataFrame()
-        self.serial_object = None
         self.gui.mainloop()  
 
     def get_coms(self):

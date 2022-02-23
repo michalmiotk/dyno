@@ -4,3 +4,4 @@ build
 dist
 main.spec
 .pytest_cache
+print.png

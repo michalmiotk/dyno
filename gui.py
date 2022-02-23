@@ -21,6 +21,7 @@ class Gui():
         self.get_coms_description_method = get_coms_description_method
         self.print_chart_method = print_chart_method
 
+        self.question_menu = None
         self.figure = Figure()
         self.root = Tk()
         self.root.title('Dyno')
@@ -69,9 +70,9 @@ class Gui():
 
         ttk.Button(text="Connect", command=self.connect_method).grid(row=3, column=3)
         ttk.Button(text="Disconnect", command=self.disconnect_method).grid(row=3, column=4)
-        ttk.Button(text="Refresh COMs", command=self.setup_dropdown_list).grid(row=3, column=5)
+        ttk.Button(text="Refresh COMs", command=self.setup_com_dropdown_list).grid(row=3, column=5)
         
-        self.setup_dropdown_list()
+        self.setup_com_dropdown_list()
 
         baud_label = ttk.Label(text="Baud")
         baud_label.grid(row=3, column=7)
@@ -94,10 +95,12 @@ class Gui():
         label1.image = test
         label1.grid(row=row, column=column)   
 
-    def setup_dropdown_list(self):
+    def setup_com_dropdown_list(self):
         self.value_inside = StringVar(self.root)
         port_list = self.get_coms_description_method()
         self.value_inside.set("Select COM")
+        if self.question_menu is not None:
+            self.question_menu.destroy()
         self.question_menu = OptionMenu(self.root, self.value_inside, *port_list)
         self.question_menu.grid(row=3, column=6)
 
