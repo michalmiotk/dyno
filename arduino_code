@@ -12,7 +12,7 @@ void loop() {
     Serial.print(x*int(sqrt(x)));
     Serial.print(", ");
     Serial.println(max_step/x);
-    delay(1000);
+    delay(100);
   }
   
 }

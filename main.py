@@ -125,9 +125,7 @@ class Program():
         while (self.update_gui_enabled):
             print("update")
             try:
-                print("probouje zdobyc dane")
                 filter_data =uart_process_q.get()
-                print("plottime", filter_data)
                 new_df = df_from_uart_row(filter_data)
                 add_to_df_with_wheel_torque(new_df, wheel_diameter_in_cm=self.gui.get_wheel_diameter())
                 add_to_df_power_in_KM(new_df)
@@ -163,7 +161,6 @@ class Program():
                 print("serial data", serial_data)
                 filter_data = convert_raw_serial_row_to_filtered_data(serial_data)
                 queue.put(filter_data)
-                print("dane wsadzone")
             except TypeError as e:
                 print("tajp error", e)
                 pass
@@ -184,7 +181,6 @@ class Program():
             print("Enter Baud and Port")
             return
 
-        print("started thread")
         self.gui.disconnect_btn.state(["!disabled"])
         t1 = threading.Thread(target=self.get_data, args=(self.uart_process_queue, self.serial_object))
         t1.daemon = True
@@ -194,7 +190,6 @@ class Program():
         
 
     def disconnect(self):
-        print("tried to disconnect")
         if self.serial_object is not None:
             self.uart_df = pd.DataFrame()
             self.serial_object.close()
@@ -203,7 +198,6 @@ class Program():
     
     def found_com_path_in_available_coms(self, com_description):
         for com in self.get_coms():
-            print(com.description)
             if str(com.description) == com_description:
                 return com.device
 
