@@ -130,18 +130,20 @@ class Program():
                 add_to_df_with_wheel_torque(new_df, wheel_diameter_in_cm=self.gui.get_wheel_diameter())
                 add_to_df_power_in_KM(new_df)
                 add_to_df_engine_rot_speed(new_df, self.gui.get_wheel_diameter(), self.gui.get_gear_ratio())
-                
+                print("adding to df done")
                 power_in_KM_list = list(new_df['power_in_KM'])
                 assert len(power_in_KM_list) == 1
                 self.gui.set_instant_power_label(power_in_KM_list[0])
                 torque_in_Nm_list = list(new_df['torque_on_wheel'])
                 assert len(torque_in_Nm_list) == 1
                 self.gui.set_instant_torque_label(torque_in_Nm_list[0])
-
+                print("setting instant done")
                 self.uart_df = pd.concat([self.uart_df, new_df])
+                print("concat done")
                 self.gui.figure.update_figure(self.uart_df)
+                print("update figure done")
                 self.gui.draw_figure(self.gui.figure.figure)
-
+                print("draw figure done")
             except queue.Empty as e:
                 print(e)
         print("updating gui stopped")
