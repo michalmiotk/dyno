@@ -69,7 +69,10 @@ class Gui():
         ttk.Button(text="Print chart", command=self.print_chart_method).grid(row=3, column=2)
 
         ttk.Button(text="Connect", command=self.connect_method).grid(row=3, column=3)
-        ttk.Button(text="Disconnect", command=self.disconnect_method).grid(row=3, column=4)
+        self.disconnect_btn = ttk.Button(text="Disconnect", command=self.disconnect_method, state = tkinter.DISABLED)
+        #self.disconnect_btn.
+        self.disconnect_btn.grid(row=3, column=4)
+        
         ttk.Button(text="Refresh COMs", command=self.setup_com_dropdown_list).grid(row=3, column=5)
         
         self.setup_com_dropdown_list()

@@ -1,6 +1,8 @@
+from cgitb import enable
 import datetime
 import queue
 import threading
+import tkinter
 
 import serial
 import serial.tools.list_ports
@@ -183,18 +185,21 @@ class Program():
             return
 
         print("started thread")
+        self.gui.disconnect_btn.state(["!disabled"])
         t1 = threading.Thread(target=self.get_data, args=(self.uart_process_queue, self.serial_object))
         t1.daemon = True
         t1.start()
         self.update_gui_enabled = True
         self.start_update_gui_thread()
-
+        
 
     def disconnect(self):
+        print("tried to disconnect")
         if self.serial_object is not None:
             self.uart_df = pd.DataFrame()
             self.serial_object.close()
             self.update_gui_enabled = False
+            self.gui.disconnect_btn.state(["disabled"])
     
     def found_com_path_in_available_coms(self, com_description):
         for com in self.get_coms():
