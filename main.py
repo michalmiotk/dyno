@@ -12,6 +12,7 @@ from data_from_df import add_to_df_with_wheel_torque, add_to_df_power_in_KM, add
 from df_from_uart import df_from_uart_row
 from gui import Gui
 from print import print_file
+from uart_preprocessing import convert_raw_serial_row_to_filtered_data
 
 class Program():
     def __init__(self):
@@ -127,11 +128,10 @@ class Program():
                 filter_data =uart_process_q.get()
                 print("plottime", filter_data)
                 new_df = df_from_uart_row(filter_data)
-                
-                
                 add_to_df_with_wheel_torque(new_df, wheel_diameter_in_cm=self.gui.get_wheel_diameter())
                 add_to_df_power_in_KM(new_df)
                 add_to_df_engine_rot_speed(new_df, self.gui.get_wheel_diameter(), self.gui.get_gear_ratio())
+                
                 power_in_KM_list = list(new_df['power_in_KM'])
                 assert len(power_in_KM_list) == 1
                 self.gui.set_instant_power_label(power_in_KM_list[0])
@@ -159,12 +159,8 @@ class Program():
             print("begin of reading from serial")
             try:
                 serial_data = serial_obj.readline()
-                serial_data = serial_data.decode("UTF-8")
-                print("oooo", serial_data)
-                serial_data = serial_data.strip('\n').strip('\r')
-                print(serial_data)
-                filter_data = serial_data.split(',')
-                filter_data = [int(d) for d in filter_data]
+                print("serial data", serial_data)
+                filter_data = convert_raw_serial_row_to_filtered_data(serial_data)
                 queue.put(filter_data)
                 print("dane wsadzone")
             except TypeError as e:
