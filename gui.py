@@ -31,7 +31,7 @@ class Gui():
         self.frm.grid()
         style = ttk.Style(self.root)
         style.theme_use('clam')
-
+        self.canvas = None
         self.figure_column_span = 8
 
         self.setup_logo(row=0, column=0)
@@ -115,15 +115,11 @@ class Gui():
         self.instant_torque_label.config(text=text)    
 
     def draw_figure(self, figure):
-        canvas = FigureCanvasTkAgg(figure, self.root)
-        canvas.draw()
-        canvas.get_tk_widget().grid(row=5, columnspan=self.figure_column_span)
+        self.canvas = FigureCanvasTkAgg(figure, self.root)
+        self.canvas.draw()
+        self.canvas.get_tk_widget().grid(row=5, columnspan=self.figure_column_span)
 
-    def draw_internal_figure(self):
-        canvas = FigureCanvasTkAgg(self.figure.figure, self.root)
-        canvas.draw()
-        canvas.get_tk_widget().grid(row=5, columnspan=self.figure_column_span)
-
+    
     def get_wheel_diameter(self):
         return float(self.wheel_diameter_entry.get())
 
