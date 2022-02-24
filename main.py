@@ -145,13 +145,6 @@ class Program():
                 add_to_df_power_in_KM(new_df)
                 add_to_df_engine_rot_speed(new_df, self.gui.get_wheel_diameter(), self.gui.get_gear_ratio())
                 l.debug("adding to df done")
-                power_in_KM_list = list(new_df['power_in_KM'])
-                #assert len(power_in_KM_list) == 1
-                self.gui.set_instant_power_label(power_in_KM_list[-1])
-                torque_in_Nm_list = list(new_df['torque_on_wheel'])
-                #assert len(torque_in_Nm_list) == 1
-                self.gui.set_instant_torque_label(torque_in_Nm_list[-1])
-                l.debug("setting instant done")
                 if self.uart_df.empty:
                     l.info("empty")
                     self.uart_df = pd.concat([self.uart_df, new_df])
@@ -186,10 +179,24 @@ class Program():
             l.debug("begin of reading from serial")
             if serial_obj.inWaiting() > 0:
                 try:
-                    serial_data = serial_obj.readline()
-                    l.debug("serial data" + str(serial_data))
-                    
-                    queue.put(serial_data)
+                    raw_data = serial_obj.readline()
+                    l.debug("serial data" + str(raw_data))
+                    queue.put(raw_data)
+
+                    filter_data = convert_raw_serial_row_to_filtered_data(raw_data)
+                    filter_data_list = [filter_data]
+                    new_df = df_from_uart_rows(filter_data_list)
+                    add_to_df_with_wheel_torque(new_df, wheel_diameter_in_cm=self.gui.get_wheel_diameter())
+                    add_to_df_power_in_KM(new_df)
+                    add_to_df_engine_rot_speed(new_df, self.gui.get_wheel_diameter(), self.gui.get_gear_ratio())
+                    l.debug("adding to df done")
+                    power_in_KM_list = list(new_df['power_in_KM'])
+                    #assert len(power_in_KM_list) == 1
+                    self.gui.set_instant_power_label(power_in_KM_list[-1])
+                    torque_in_Nm_list = list(new_df['torque_on_wheel'])
+                    #assert len(torque_in_Nm_list) == 1
+                    self.gui.set_instant_torque_label(torque_in_Nm_list[-1])
+                        
                 except TypeError as e:
                     l.debug("tajp error" + str(e))
                     pass
