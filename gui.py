@@ -27,83 +27,94 @@ class Gui():
         self.root.title('Dyno')
         photo = tkinter.PhotoImage(file = "logo.png")
         self.root.iconphoto(False, photo)
-        self.frm = ttk.Frame(self.root, padding=10)
-        self.frm.grid()
+        tabControl = ttk.Notebook(self.root)
+  
+        
+        self.figure_frm = ttk.Frame(tabControl, padding=10)
+        self.figure_frm.grid()
+        self.uart_frame = ttk.Frame(tabControl)
+        self.uart_frame.grid()
+        tabControl.add(self.figure_frm, text ='Figure')
+        tabControl.add(self.uart_frame, text ='uart')
+        tabControl.pack(expand = 1, fill ="both")
+        
+        
+        
         style = ttk.Style(self.root)
         style.theme_use('clam')
         self.canvas = None
         self.figure_column_span = 8
 
         self.setup_logo(row=0, column=0)
-        ttk.Label(self.root, text="Wheel diameter in cm").grid(row=0, column=1)
 
-        self.wheel_diameter_entry = ttk.Entry(self.root)
+        self.setup_uart_gui()
+
+        ttk.Label(self.figure_frm, text="Wheel diameter in cm").grid(row=0, column=1)
+
+        self.wheel_diameter_entry = ttk.Entry(self.figure_frm)
         self.wheel_diameter_entry.insert(0, '1')
         self.wheel_diameter_entry.grid(row=0, column=2)
 
-        ttk.Label(self.root, text="Entire gear ratio").grid(row=0, column=3)
+        ttk.Label(self.figure_frm, text="Entire gear ratio").grid(row=0, column=3)
 
-        self.gear_ratio_entry = ttk.Entry(self.root)
+        self.gear_ratio_entry = ttk.Entry(self.figure_frm)
         self.gear_ratio_entry.insert(0, '1')
         self.gear_ratio_entry.grid(row=0, column=4)
 
-        ttk.Label(self.root, text="Moto name").grid(row=0, column=5)
+        ttk.Label(self.figure_frm, text="Moto name").grid(row=0, column=5)
 
-        self.moto_name_entry = ttk.Entry(self.root)
+        self.moto_name_entry = ttk.Entry(self.figure_frm)
         self.moto_name_entry.grid(row=0, column=6)
 
-        
-        
-        self.instant_power_label = tkinter.Label(self.root, fg="red", font=("Courier", 24))
+        self.instant_power_label = tkinter.Label(self.figure_frm, fg="red", font=("Courier", 24))
         self.instant_power_label.grid(row=2, column=0)
-        self.instant_torque_label = tkinter.Label(self.root, fg="blue", font=("Courier", 24))
+        self.instant_torque_label = tkinter.Label(self.figure_frm, fg="blue", font=("Courier", 24))
         self.instant_torque_label.grid(row=2, column=1)
 
-        self.communicates_label = ttk.Label(self.root)
+        self.communicates_label = ttk.Label(self.figure_frm)
         self.communicates_label.grid(row=2, column=2)
 
         
         
-        ttk.Button(text="Open file", command=self.select_file_method).grid(row=3, column=0)
-        ttk.Button(text="Save figure", command=self.save_figure_method).grid(row=3, column=1)
-        ttk.Button(text="Print chart", command=self.print_chart_method).grid(row=3, column=2)
+        ttk.Button(self.figure_frm, text="Open file", command=self.select_file_method).grid(row=3, column=0)
+        ttk.Button(self.figure_frm, text="Save figure", command=self.save_figure_method).grid(row=3, column=1)
+        ttk.Button(self.figure_frm, text="Print chart", command=self.print_chart_method).grid(row=3, column=2)
 
-        ttk.Button(text="Connect", command=self.connect_method).grid(row=3, column=3)
-        self.disconnect_btn = ttk.Button(text="Disconnect", command=self.disconnect_method, state = tkinter.DISABLED)
-        self.disconnect_btn.grid(row=3, column=4)
-        
-        ttk.Button(text="Refresh COMs", command=self.setup_com_dropdown_list).grid(row=3, column=5)
-        
-        self.setup_com_dropdown_list()
-
-        baud_label = ttk.Label(text="Baud")
-        baud_label.grid(row=3, column=7)
-
-        self.baud_entry = ttk.Entry(width=7)
-        self.baud_entry.grid(row=3, column=8)
-        self.baud_entry.insert(0, '9600')
-        self.canvas = FigureCanvasTkAgg(self.figure.figure, self.root)
+        self.canvas = FigureCanvasTkAgg(self.figure.figure, self.figure_frm)
         self.draw_figure()
 
+    def setup_uart_gui(self):
+        ttk.Button(self.uart_frame, text="Connect", command=self.connect_method).grid(row=3, column=3)
+        self.disconnect_btn = ttk.Button(self.uart_frame, text="Disconnect", command=self.disconnect_method, state = tkinter.DISABLED)
+        self.disconnect_btn.grid(row=3, column=4)
+        
+        ttk.Button(self.uart_frame, text="Refresh COMs", command=self.setup_com_dropdown_list).grid(row=3, column=5)
         
         
-        
+
+        baud_label = ttk.Label(self.uart_frame, text="Baud")
+        baud_label.grid(row=3, column=7)
+
+        self.baud_entry = ttk.Entry(self.uart_frame, width=7)
+        self.baud_entry.grid(row=3, column=8)
+        self.baud_entry.insert(0, '9600')
+        self.setup_com_dropdown_list()
 
     def setup_logo(self, row, column):
         logo = Image.open("logo.png")
         logo_small = logo.resize((122, 56), Image.ANTIALIAS)
         test = ImageTk.PhotoImage(logo_small)
-        label1 = tkinter.Label(image=test, bg="white")
+        label1 = tkinter.Label(self.figure_frm, image=test, bg="white")
         label1.image = test
         label1.grid(row=row, column=column)   
 
     def setup_com_dropdown_list(self):
-        self.value_inside = StringVar(self.root)
+        self.value_inside = StringVar(self.uart_frame)
         port_list = self.get_coms_description_method()
         self.value_inside.set("Select COM")
         if self.question_menu is not None:
             self.question_menu.destroy()
-        self.question_menu = OptionMenu(self.root, self.value_inside, *port_list)
+        self.question_menu = OptionMenu(self.uart_frame, self.value_inside, *port_list)
         self.question_menu.grid(row=3, column=6)
 
     def set_instant_power_label(self, instant_power_in_KM: float):
