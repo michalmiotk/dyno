@@ -4,7 +4,7 @@ jobs:
   build:
     working_directory: ~/circleci-python
     docker:
-      - image: "circleci/python:3.10"
+      - image: "python/windowsservercore-ltsc2022"
     steps:
       - checkout
       - run: pip install -r requirements.txt
@@ -13,7 +13,7 @@ jobs:
   test:
     working_directory: ~/circleci-python
     docker:
-      - image: "circleci/python:3.10"
+      - image: "python/windowsservercore-ltsc2022"
     steps:
       - checkout
       - run: pip install -r requirements.txt
