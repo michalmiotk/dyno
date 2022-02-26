@@ -1,6 +1,7 @@
 # requirements 
 python 3.10.2
-
+pip install -r requirements.txt
+pip install pywin32==303
 # building 
 ```
 pip install -r requirements.txt

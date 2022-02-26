@@ -2,7 +2,6 @@ from tkinter import Tk
 from tkinter import ttk
 from tkinter import filedialog as fd
 from tkinter import StringVar
-from tkinter import OptionMenu
 import tkinter
 from PIL import ImageTk, Image 
 
@@ -21,7 +20,7 @@ class Gui():
         self.get_coms_description_method = get_coms_description_method
         self.print_chart_method = print_chart_method
 
-        self.question_menu = None
+        self.com_dropdown_list = None
         self.figure = Figure()
         self.root = Tk()
         self.root.title('Dyno')
@@ -112,10 +111,10 @@ class Gui():
         self.value_inside = StringVar(self.uart_frame)
         port_list = self.get_coms_description_method()
         self.value_inside.set("Select COM")
-        if self.question_menu is not None:
-            self.question_menu.destroy()
-        self.question_menu = OptionMenu(self.uart_frame, self.value_inside, *port_list)
-        self.question_menu.grid(row=3, column=6)
+        if self.com_dropdown_list is not None:
+            self.com_dropdown_list.destroy()
+        self.com_dropdown_list = ttk.OptionMenu(self.uart_frame, self.value_inside,*port_list)
+        self.com_dropdown_list.grid(row=3, column=6)
 
     def set_instant_power_label(self, instant_power_in_KM: float):
         text = str(round(instant_power_in_KM, 1)) + ' KM'
