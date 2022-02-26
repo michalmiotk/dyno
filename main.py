@@ -90,7 +90,7 @@ class Program():
         add_to_df_power_in_KM(df)
         add_to_df_engine_rot_speed(df, self.gui.get_wheel_diameter(), self.gui.get_gear_ratio())
         self.gui.figure.update_figure(df)
-        self.gui.draw_figure(self.gui.figure.figure)
+        self.gui.draw_figure()
 
     def print_chart_method(self):
         if self.gui.figure.is_figure_empty():
@@ -145,18 +145,13 @@ class Program():
                 add_to_df_power_in_KM(new_df)
                 add_to_df_engine_rot_speed(new_df, self.gui.get_wheel_diameter(), self.gui.get_gear_ratio())
                 l.debug("adding to df done")
-                if self.uart_df.empty:
-                    l.info("empty")
-                    self.uart_df = pd.concat([self.uart_df, new_df])
-                else:
-                    l.info("not empty")
-                    self.uart_df = self.uart_df.append(new_df)
+                self.uart_df = pd.concat([self.uart_df, new_df])
                 l.debug("concat done")
                 self.gui.figure.update_figure(self.uart_df)
                 l.debug("update figure done")
-                self.gui.draw_figure(self.gui.figure.figure)
+                self.gui.draw_figure()
                 l.debug("draw figure done")
-                time.sleep(2)
+                time.sleep(0.5)
                 l.info("update")
             except queue.Empty as e:
                 l.debug(e)
@@ -200,7 +195,9 @@ class Program():
                 except TypeError as e:
                     l.debug("tajp error" + str(e))
                     pass
-                
+                except UnicodeDecodeError as unicodeDecode:
+                    l.debug("UnicodeDecodeError" + str(unicodeDecode))
+                    pass
 
     def connect(self):
         self.uart_df = pd.DataFrame()

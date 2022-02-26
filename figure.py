@@ -6,12 +6,14 @@ class Figure():
         self.figsize = (8,5)
         self.figure =plt.Figure(figsize=self.figsize, dpi=100)
         self.marg = 0.15
-        self.ax = self.figure.add_axes([self.marg, self.marg, 1-1.8*self.marg, 1-1.8*self.marg])
+        self.axe_rect = [self.marg, self.marg, 1-1.8*self.marg, 1-1.8*self.marg]
+        self.ax = self.figure.add_axes(self.axe_rect)
         
         
     def update_figure(self, df):
-        self.figure =plt.Figure(figsize=self.figsize, dpi=100)
-        self.ax = self.figure.add_axes([self.marg, self.marg, 1-1.8*self.marg, 1-1.8*self.marg])
+        #self.figure =plt.Figure(figsize=self.figsize, dpi=100)
+        self.ax.remove()
+        self.ax = self.figure.add_axes(self.axe_rect)
         self.ax.plot(df['engine_rot_speed'], df['torque_on_wheel'], c='blue', lw=1, label="torque_on_wheel", marker='s')
         self.ax.plot(df['engine_rot_speed'], df['power_in_KM'], c='red', lw=1, label="power[KM]", marker='d')
         self.ax.set_xlabel("engine_rot_speed", fontsize=14)

@@ -82,8 +82,8 @@ class Gui():
         self.baud_entry = ttk.Entry(width=7)
         self.baud_entry.grid(row=3, column=8)
         self.baud_entry.insert(0, '9600')
-
-        self.draw_figure(self.figure.figure)
+        self.canvas = FigureCanvasTkAgg(self.figure.figure, self.root)
+        self.draw_figure()
 
         
         
@@ -114,8 +114,8 @@ class Gui():
         text = str(round(instant_torque_in_Nm, 1)) + ' Nm'
         self.instant_torque_label.config(text=text)    
 
-    def draw_figure(self, figure):
-        self.canvas = FigureCanvasTkAgg(figure, self.root)
+    def draw_figure(self):
+        
         self.canvas.draw()
         self.canvas.get_tk_widget().grid(row=5, columnspan=self.figure_column_span)
 
