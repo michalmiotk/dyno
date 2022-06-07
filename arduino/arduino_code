@@ -14,5 +14,5 @@ void loop() {
     Serial.println(max_step/x);
     delay(100);
   }
-  
+
 }
