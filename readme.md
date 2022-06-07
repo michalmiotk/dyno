@@ -18,7 +18,7 @@ good to check that file is virus free by: https://www.virustotal.com/
 # run tests
 
 
-![how_app_look](app_preview.PNG)
+![how_app_look](readme_imgs/app_preview.PNG)
 
 # run
 python main.py

@@ -97,7 +97,7 @@ class Program():
             self.gui.set_communicates_label("No figure")
             return
         self.gui.clear_communicates_label()
-        figure_filename = 'print.png'
+        figure_filename = 'screenshots/print.png'
 
         moto_name = self.gui.get_moto_name()
         if moto_name == '':
@@ -121,7 +121,7 @@ class Program():
 
         self.gui.clear_communicates_label()
 
-        self.gui.figure.save_figure(moto_name + '_' + now_time + '.png')
+        self.gui.figure.save_figure('screenshots/' + moto_name + '_' + now_time + '.png')
 
     def get_df_from_filtered_data_from_uart(self, filtered_data_from_uart: list) -> pd.DataFrame:
         new_df = df_from_uart_rows(filtered_data_from_uart)

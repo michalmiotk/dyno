@@ -3,7 +3,7 @@ from tkinter import ttk
 from tkinter import filedialog as fd
 from tkinter import StringVar
 import tkinter
-from PIL import ImageTk, Image 
+from PIL import ImageTk, Image
 
 from figure import Figure
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
@@ -24,11 +24,11 @@ class Gui():
         self.figure = Figure()
         self.root = Tk()
         self.root.title('Dyno')
-        photo = tkinter.PhotoImage(file = "logo.png")
+        photo = tkinter.PhotoImage(file = "imgs/logo.png")
         self.root.iconphoto(False, photo)
         tabControl = ttk.Notebook(self.root)
-  
-        
+
+
         self.figure_frm = ttk.Frame(tabControl, padding=10)
         self.figure_frm.grid()
         self.uart_frame = ttk.Frame(tabControl)
@@ -36,9 +36,9 @@ class Gui():
         tabControl.add(self.figure_frm, text ='Figure')
         tabControl.add(self.uart_frame, text ='uart')
         tabControl.pack(expand = 1, fill ="both")
-        
-        
-        
+
+
+
         style = ttk.Style(self.root)
         style.theme_use('clam')
         self.canvas = None
@@ -73,8 +73,8 @@ class Gui():
         self.communicates_label = ttk.Label(self.figure_frm)
         self.communicates_label.grid(row=2, column=2)
 
-        
-        
+
+
         ttk.Button(self.figure_frm, text="Open file", command=self.select_file_method).grid(row=3, column=0)
         ttk.Button(self.figure_frm, text="Save figure", command=self.save_figure_method).grid(row=3, column=1)
         ttk.Button(self.figure_frm, text="Print chart", command=self.print_chart_method).grid(row=3, column=2)
@@ -86,10 +86,10 @@ class Gui():
         ttk.Button(self.uart_frame, text="Connect", command=self.connect_method).grid(row=3, column=3)
         self.disconnect_btn = ttk.Button(self.uart_frame, text="Disconnect", command=self.disconnect_method, state = tkinter.DISABLED)
         self.disconnect_btn.grid(row=3, column=4)
-        
+
         ttk.Button(self.uart_frame, text="Refresh COMs", command=self.setup_com_dropdown_list).grid(row=3, column=5)
-        
-        
+
+
 
         baud_label = ttk.Label(self.uart_frame, text="Baud")
         baud_label.grid(row=3, column=7)
@@ -100,12 +100,12 @@ class Gui():
         self.setup_com_dropdown_list()
 
     def setup_logo(self, row, column):
-        logo = Image.open("logo.png")
+        logo = Image.open("imgs/logo.png")
         logo_small = logo.resize((122, 56), Image.ANTIALIAS)
         test = ImageTk.PhotoImage(logo_small)
         label1 = tkinter.Label(self.figure_frm, image=test, bg="white")
         label1.image = test
-        label1.grid(row=row, column=column)   
+        label1.grid(row=row, column=column)
 
     def setup_com_dropdown_list(self):
         self.value_inside = StringVar(self.uart_frame)
@@ -118,18 +118,18 @@ class Gui():
 
     def set_instant_power_label(self, instant_power_in_KM: float):
         text = str(round(instant_power_in_KM, 1)) + ' KM'
-        self.instant_power_label.config(text=text)    
+        self.instant_power_label.config(text=text)
 
     def set_instant_torque_label(self, instant_torque_in_Nm: float):
         text = str(round(instant_torque_in_Nm, 1)) + ' Nm'
-        self.instant_torque_label.config(text=text)    
+        self.instant_torque_label.config(text=text)
 
     def draw_figure(self):
-        
+
         self.canvas.draw()
         self.canvas.get_tk_widget().grid(row=5, columnspan=self.figure_column_span)
 
-    
+
     def get_wheel_diameter(self):
         return float(self.wheel_diameter_entry.get())
 
@@ -147,7 +147,7 @@ class Gui():
 
     def get_moto_name(self):
         return self.moto_name_entry.get()
-    
+
     def set_communicates_label(self, text):
         self.communicates_label.config(text=text)
 
@@ -164,5 +164,5 @@ class Gui():
             title='Open a file',
             initialdir='./',
             filetypes=filetypes)
-        
+
         return filename
