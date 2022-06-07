@@ -78,25 +78,27 @@ class Gui():
         ttk.Button(self.figure_frm, text="Open file", command=self.select_file_method).grid(row=3, column=0)
         ttk.Button(self.figure_frm, text="Save figure", command=self.save_figure_method).grid(row=3, column=1)
         ttk.Button(self.figure_frm, text="Print chart", command=self.print_chart_method).grid(row=3, column=2)
-
+        n_rows =1
+        n_columns =5
+        self.uart_frame.grid_rowconfigure(tuple(range(n_rows+1)),  weight =1)
+        self.uart_frame.grid_columnconfigure(tuple(range(n_columns+1)),  weight =1)
         self.canvas = FigureCanvasTkAgg(self.figure.figure, self.figure_frm)
         self.draw_figure()
 
     def setup_uart_gui(self):
-        ttk.Button(self.uart_frame, text="Connect", command=self.connect_method).grid(row=3, column=3)
+        ttk.Button(self.uart_frame, text="Connect", command=self.connect_method).grid(row=0, column=0, sticky="we")
         self.disconnect_btn = ttk.Button(self.uart_frame, text="Disconnect", command=self.disconnect_method, state = tkinter.DISABLED)
-        self.disconnect_btn.grid(row=3, column=4)
-
-        ttk.Button(self.uart_frame, text="Refresh COMs", command=self.setup_com_dropdown_list).grid(row=3, column=5)
-
-
+        self.disconnect_btn.grid(row=0, column=1, sticky="we")
 
         baud_label = ttk.Label(self.uart_frame, text="Baud")
-        baud_label.grid(row=3, column=7)
+        baud_label.grid(row=0, column=2, sticky="we")
+        baud_label.configure(anchor="center")
 
-        self.baud_entry = ttk.Entry(self.uart_frame, width=7)
-        self.baud_entry.grid(row=3, column=8)
+        self.baud_entry = ttk.Entry(self.uart_frame, justify='center', width=7)
+        self.baud_entry.grid(row=0, column=3, sticky="we")
         self.baud_entry.insert(0, '9600')
+
+        ttk.Button(self.uart_frame, text="Refresh COMs", command=self.setup_com_dropdown_list).grid(row=0, column=4)
         self.setup_com_dropdown_list()
 
     def setup_logo(self, row, column):
@@ -114,7 +116,7 @@ class Gui():
         if self.com_dropdown_list is not None:
             self.com_dropdown_list.destroy()
         self.com_dropdown_list = ttk.OptionMenu(self.uart_frame, self.value_inside,*port_list)
-        self.com_dropdown_list.grid(row=3, column=6)
+        self.com_dropdown_list.grid(row=0, column=5, sticky="we")
 
     def set_instant_power_label(self, instant_power_in_KM: float):
         text = str(round(instant_power_in_KM, 1)) + ' KM'
