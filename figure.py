@@ -3,8 +3,8 @@ from data_from_df import get_max_power_in_KM
 
 class Figure():
     def __init__(self):
-        self.figsize = (8,5)
-        self.figure =plt.Figure(figsize=self.figsize, dpi=100)
+        #self.figsize = (8,5)
+        self.figure =plt.Figure(dpi=100)
         self.marg = 0.15
         self.axe_rect = [self.marg, self.marg, 1-1.8*self.marg, 1-1.8*self.marg]
         self.ax = self.figure.add_axes(self.axe_rect)

@@ -37,55 +37,59 @@ class Gui():
         tabControl.add(self.uart_frame, text ='uart')
         tabControl.pack(expand = 1, fill ="both")
 
-
-
         style = ttk.Style(self.root)
         style.theme_use('clam')
         self.canvas = None
-        self.figure_column_span = 8
-
+        self.figure_column_span = 7
+        self.figure_row_span = 3
         self.setup_logo(row=0, column=0)
 
         self.setup_uart_gui()
+        self.setup_figure_gui()
+        self.canvas = FigureCanvasTkAgg(self.figure.figure, self.figure_frm)
+        self.draw_figure()
 
-        ttk.Label(self.figure_frm, text="Wheel diameter in cm").grid(row=0, column=1)
+    def setup_figure_gui(self):
+        n_rows =7
+        n_columns =6
+        self.figure_frm.grid_rowconfigure(tuple(range(n_rows+1)),  weight=1)
+        self.figure_frm.grid_columnconfigure(tuple(range(n_columns+1)), weight =1)
+
+        ttk.Label(self.figure_frm, text="Wheel diameter in cm").grid(row=0, column=1, sticky="nesw")
 
         self.wheel_diameter_entry = ttk.Entry(self.figure_frm)
         self.wheel_diameter_entry.insert(0, '1')
-        self.wheel_diameter_entry.grid(row=0, column=2)
+        self.wheel_diameter_entry.grid(row=0, column=2, sticky="nesw")
 
-        ttk.Label(self.figure_frm, text="Entire gear ratio").grid(row=0, column=3)
+        ttk.Label(self.figure_frm, text="Entire gear ratio").grid(row=0, column=3, sticky="nesw")
 
         self.gear_ratio_entry = ttk.Entry(self.figure_frm)
         self.gear_ratio_entry.insert(0, '1')
-        self.gear_ratio_entry.grid(row=0, column=4)
+        self.gear_ratio_entry.grid(row=0, column=4, sticky="nesw")
 
-        ttk.Label(self.figure_frm, text="Moto name").grid(row=0, column=5)
+        ttk.Label(self.figure_frm, text="Moto name").grid(row=0, column=5, sticky="nesw")
 
         self.moto_name_entry = ttk.Entry(self.figure_frm)
-        self.moto_name_entry.grid(row=0, column=6)
+        self.moto_name_entry.grid(row=0, column=6, sticky="nesw")
 
         self.instant_power_label = tkinter.Label(self.figure_frm, fg="red", font=("Courier", 24))
-        self.instant_power_label.grid(row=2, column=0)
+        self.instant_power_label.grid(row=2, column=0, sticky="nesw")
         self.instant_torque_label = tkinter.Label(self.figure_frm, fg="blue", font=("Courier", 24))
-        self.instant_torque_label.grid(row=2, column=1)
+        self.instant_torque_label.grid(row=2, column=1, sticky="nesw")
 
         self.communicates_label = ttk.Label(self.figure_frm)
-        self.communicates_label.grid(row=2, column=2)
+        self.communicates_label.grid(row=2, column=2, sticky="nesw")
 
+        ttk.Button(self.figure_frm, text="Open file", command=self.select_file_method).grid(row=3, column=0, sticky="nesw")
+        ttk.Button(self.figure_frm, text="Save figure", command=self.save_figure_method).grid(row=3, column=1, sticky="nesw")
+        ttk.Button(self.figure_frm, text="Print chart", command=self.print_chart_method).grid(row=3, column=2, sticky="nesw")
 
-
-        ttk.Button(self.figure_frm, text="Open file", command=self.select_file_method).grid(row=3, column=0)
-        ttk.Button(self.figure_frm, text="Save figure", command=self.save_figure_method).grid(row=3, column=1)
-        ttk.Button(self.figure_frm, text="Print chart", command=self.print_chart_method).grid(row=3, column=2)
+    def setup_uart_gui(self):
         n_rows =1
         n_columns =5
         self.uart_frame.grid_rowconfigure(tuple(range(n_rows+1)),  weight =1)
         self.uart_frame.grid_columnconfigure(tuple(range(n_columns+1)),  weight =1)
-        self.canvas = FigureCanvasTkAgg(self.figure.figure, self.figure_frm)
-        self.draw_figure()
 
-    def setup_uart_gui(self):
         ttk.Button(self.uart_frame, text="Connect", command=self.connect_method).grid(row=0, column=0, sticky="we")
         self.disconnect_btn = ttk.Button(self.uart_frame, text="Disconnect", command=self.disconnect_method, state = tkinter.DISABLED)
         self.disconnect_btn.grid(row=0, column=1, sticky="we")
@@ -129,7 +133,7 @@ class Gui():
     def draw_figure(self):
 
         self.canvas.draw()
-        self.canvas.get_tk_widget().grid(row=5, columnspan=self.figure_column_span)
+        self.canvas.get_tk_widget().grid(row=4, columnspan=self.figure_column_span, rowspan=self.figure_row_span, sticky="we")
 
 
     def get_wheel_diameter(self):
