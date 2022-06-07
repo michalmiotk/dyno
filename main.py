@@ -23,12 +23,12 @@ class Program():
     def __init__(self):
         self.gui = Gui(self.connect, self.disconnect, self.save_figure, self.select_file, self.get_coms_description, self.print_chart_method)
         self.serial_object = None
-                
+
         self.uart_process_queue = queue.Queue()
 
         self.update_gui_enabled = False
         self.uart_df = pd.DataFrame()
-        self.gui.mainloop()  
+        self.gui.mainloop()
 
     def get_coms(self):
         return serial.tools.list_ports.comports()
@@ -47,7 +47,7 @@ class Program():
             l.debug("not valid gear_ratio")
         else:
             return True
-    
+
         return False
 
 
@@ -59,12 +59,12 @@ class Program():
             l.debug("not valid wheel_diameter")
         else:
             return True
-        
+
         return False
-    
+
 
     def select_file(self):
-        
+
         if not self.is_valid_wheel_diameter():
             self.gui.set_communicates_label("bad wheel diameter format")
             return
@@ -72,15 +72,15 @@ class Program():
         if not self.is_valid_gear_ratio():
             self.gui.set_communicates_label("bad gear ratio format")
             return
-    
+
         filename = self.gui.choose_filename()
 
         if filename == '':
-            self.gui.set_communicates_label("No choosen file")    
+            self.gui.set_communicates_label("No choosen file")
             return
-        
+
         if not is_valid_csv(filename):
-            self.gui.set_communicates_label("No valid csv")    
+            self.gui.set_communicates_label("No valid csv")
             return
 
         self.gui.clear_communicates_label()
@@ -98,12 +98,12 @@ class Program():
             return
         self.gui.clear_communicates_label()
         figure_filename = 'print.png'
-        
+
         moto_name = self.gui.get_moto_name()
         if moto_name == '':
-            self.gui.set_communicates_label("Empty moto name - needed for printing")    
+            self.gui.set_communicates_label("Empty moto name - needed for printing")
             return
-        
+
         self.gui.figure.add_moto_name_to_figure(moto_name)
         self.gui.figure.save_figure(figure_filename)
         print_file(figure_filename)
@@ -111,25 +111,29 @@ class Program():
     def save_figure(self):
         moto_name = self.gui.get_moto_name()
         if moto_name == '':
-            self.gui.set_communicates_label("Empty moto name")    
+            self.gui.set_communicates_label("Empty moto name")
             return
-    
+
         now_time = str(datetime.datetime.now().strftime("%Y_%m_%d_%H_%M_%S"))
         if self.gui.figure.is_figure_empty():
             self.gui.set_communicates_label("No figure")
             return
 
         self.gui.clear_communicates_label()
-    
+
         self.gui.figure.save_figure(moto_name + '_' + now_time + '.png')
 
-    
+    def get_df_from_filtered_data_from_uart(self, filtered_data_from_uart: list) -> pd.DataFrame:
+        new_df = df_from_uart_rows(filtered_data_from_uart)
+        add_to_df_with_wheel_torque(new_df, wheel_diameter_in_cm=self.gui.get_wheel_diameter())
+        add_to_df_power_in_KM(new_df)
+        add_to_df_engine_rot_speed(new_df, self.gui.get_wheel_diameter(), self.gui.get_gear_ratio())
+        return new_df
+
     def update_gui(self, uart_process_q):
-        x = 0
         while (self.update_gui_enabled):
             l.debug("update")
             try:
-                x += 1
                 filter_data_list = []
                 while not uart_process_q.empty():
                     raw_data =uart_process_q.get()
@@ -139,13 +143,14 @@ class Program():
                     filter_data_list.append(filter_data)
                 if len(filter_data_list) == 0:
                     continue
+                df_from_recv_data = self.get_df_from_filtered_data_from_uart(filter_data_list)
+                power_in_KM, torque_in_Nm = self.filter_data_list_to_instant_labels(df_from_recv_data)
+                self.gui.set_instant_power_label(power_in_KM)
 
-                new_df = df_from_uart_rows(filter_data_list)
-                add_to_df_with_wheel_torque(new_df, wheel_diameter_in_cm=self.gui.get_wheel_diameter())
-                add_to_df_power_in_KM(new_df)
-                add_to_df_engine_rot_speed(new_df, self.gui.get_wheel_diameter(), self.gui.get_gear_ratio())
+                self.gui.set_instant_torque_label(torque_in_Nm)
+
                 l.debug("adding to df done")
-                self.uart_df = pd.concat([self.uart_df, new_df])
+                self.uart_df = pd.concat([self.uart_df, df_from_recv_data])
                 l.debug("concat done")
                 self.gui.figure.update_figure(self.uart_df)
                 l.debug("update figure done")
@@ -161,15 +166,24 @@ class Program():
                 l.debug("Value err" + str(v))
 
         l.debug("updating gui stopped")
-    
+
 
     def start_update_gui_thread(self):
         t2 = threading.Thread(target=self.update_gui, args=(self.uart_process_queue,))
         t2.daemon = True
         t2.start()
-    
 
-    def get_data(self, queue, serial_obj):
+    def start_get_data_thread(self):
+        t1 = threading.Thread(target=self.get_data, args=(self.uart_process_queue, self.serial_object))
+        t1.daemon = True
+        t1.start()
+
+    def filter_data_list_to_instant_labels(self, df_with_received_data):
+        power_in_KM_list = list(df_with_received_data['power_in_KM'])
+        torque_in_Nm_list = list(df_with_received_data['torque_on_wheel'])
+        return power_in_KM_list[-1], torque_in_Nm_list[-1]
+
+    def get_data(self, queue: queue.Queue, serial_obj: serial.Serial):
         while serial_obj.isOpen():
             l.debug("begin of reading from serial")
             if serial_obj.inWaiting() > 0:
@@ -178,20 +192,6 @@ class Program():
                     l.debug("serial data" + str(raw_data))
                     queue.put(raw_data)
 
-                    filter_data = convert_raw_serial_row_to_filtered_data(raw_data)
-                    filter_data_list = [filter_data]
-                    new_df = df_from_uart_rows(filter_data_list)
-                    add_to_df_with_wheel_torque(new_df, wheel_diameter_in_cm=self.gui.get_wheel_diameter())
-                    add_to_df_power_in_KM(new_df)
-                    add_to_df_engine_rot_speed(new_df, self.gui.get_wheel_diameter(), self.gui.get_gear_ratio())
-                    l.debug("adding to df done")
-                    power_in_KM_list = list(new_df['power_in_KM'])
-                    #assert len(power_in_KM_list) == 1
-                    self.gui.set_instant_power_label(power_in_KM_list[-1])
-                    torque_in_Nm_list = list(new_df['torque_on_wheel'])
-                    #assert len(torque_in_Nm_list) == 1
-                    self.gui.set_instant_torque_label(torque_in_Nm_list[-1])
-                        
                 except TypeError as e:
                     l.debug("tajp error" + str(e))
                     pass
@@ -202,11 +202,11 @@ class Program():
     def connect(self):
         self.uart_df = pd.DataFrame()
         com_description = self.gui.value_inside.get()
-        port = self.found_com_path_in_available_coms(com_description) 
+        port = self.found_com_path_in_available_coms(com_description)
         if port is None:
             self.gui.set_communicates_label("can't find " + com_description)
             return
-        baud = self.gui.get_baud() 
+        baud = self.gui.get_baud()
         try:
             self.serial_object = serial.Serial(port, baud)
 
@@ -215,12 +215,10 @@ class Program():
             return
 
         self.gui.disconnect_btn.state(["!disabled"])
-        t1 = threading.Thread(target=self.get_data, args=(self.uart_process_queue, self.serial_object))
-        t1.daemon = True
-        t1.start()
+        self.start_get_data_thread()
         self.update_gui_enabled = True
         self.start_update_gui_thread()
-        
+
 
     def disconnect(self):
         if self.serial_object is not None:
@@ -228,8 +226,8 @@ class Program():
             self.serial_object.close()
             self.update_gui_enabled = False
             self.gui.disconnect_btn.state(["disabled"])
-    
-    def found_com_path_in_available_coms(self, com_description):
+
+    def found_com_path_in_available_coms(self, com_description: str):
         for com in self.get_coms():
             if str(com.description) == com_description:
                 return com.device
