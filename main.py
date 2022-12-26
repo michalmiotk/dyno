@@ -17,6 +17,10 @@ from df_from_uart import df_from_uart_rows
 from gui import Gui
 from print import print_file
 from uart_preprocessing import raw_serial_row_to_filtered_data
+from savestate import SaveState
+from savestateemptyfigure import SaveStateEmptyFigure
+from savestatemissingfield import SaveStateMissingField
+
 
 import time
 import logging as log
@@ -34,6 +38,7 @@ class Program:
             self.select_file,
             self.get_coms_description,
             self.print_chart_method,
+            self.undo_method
         )
         self.serial_object = None
 
@@ -41,8 +46,9 @@ class Program:
 
         self.update_gui_enabled = False
         self.uart_df = pd.DataFrame()
+        self.memento_list = []
         self.gui.mainloop()
-
+        
     def get_coms(self):
         return serial.tools.list_ports.comports()
 
@@ -121,22 +127,29 @@ class Program:
         self.gui.figure.save_figure(figure_filename)
         print_file(figure_filename)
 
-    def save_figure(self):
+    def set_state(self):
         moto_name = self.gui.get_moto_name()
         if moto_name == "":
-            self.gui.set_communicates_label("Empty moto name")
+            self.savestate = SaveStateMissingField(self.gui)
             return
-
-        now_time = str(datetime.datetime.now().strftime("%Y_%m_%d_%H_%M_%S"))
+        
         if self.gui.figure.is_figure_empty():
-            self.gui.set_communicates_label("No figure")
+            self.savestate = SaveStateEmptyFigure(self.gui)
             return
 
-        self.gui.clear_communicates_label()
+        self.savestate = SaveState(self.gui)
+    
+    def undo_method(self):
+        if len(self.memento_list):
+            memento = self.memento_list.pop()
+            self.savestate.restore(memento)
 
-        self.gui.figure.save_figure(
-            "screenshots/" + moto_name + "_" + now_time + ".png"
-        )
+    def save_figure(self):
+        self.set_state()
+        self.savestate()
+        memento = self.savestate.create_memento()
+        if memento:
+            self.memento_list.append(memento)
 
     def get_df_from_filtered_data_from_uart(
         self, filtered_data_from_uart: list

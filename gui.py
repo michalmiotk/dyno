@@ -18,6 +18,7 @@ class Gui:
         select_file_method,
         get_coms_description_method,
         print_chart_method,
+        undo_method
     ):
 
         self.connect_method = connect_method
@@ -26,7 +27,8 @@ class Gui:
         self.select_file_method = select_file_method
         self.get_coms_description_method = get_coms_description_method
         self.print_chart_method = print_chart_method
-
+        self.undo_method = undo_method
+        
         self.com_dropdown_list = None
         self.figure = Figure()
         self.root = Tk()
@@ -105,7 +107,13 @@ class Gui:
         ttk.Button(
             self.figure_frm, text="Print chart", command=self.print_chart_method
         ).grid(row=2, column=2, sticky="nesw")
-
+        ttk.Button(
+            self.figure_frm, text="Undo", command=self.undo_method
+        ).grid(row=2, column=3, sticky="nesw")
+    
+    def undo(self):
+        pass
+    
     def setup_uart_gui(self):
         n_rows = 1
         n_columns = 5
